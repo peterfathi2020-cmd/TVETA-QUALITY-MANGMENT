@@ -21,11 +21,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'tveta_auth_user';
 
-// Hardcoded Admins for guaranteed access (Fallback & Super Admins)
+// Updated Admin Credentials as requested
 const SPECIAL_ADMINS = [
   { email: 'peterfathi2020@gmail.com', password: 'pepo_1759', name: 'Peter Fathi (Admin)' },
-  { email: 'sayedjica2016@gmail.com', password: '01200355618', name: 'Sayed Jica (Admin)' },
-  { email: 'admin@tveta.edu.eg', password: '123456', name: 'System Administrator' }
+  { email: 'sayedjica2016@gmail.com', password: '01200355618', name: 'Sayed Jica (Admin)' }
 ];
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -76,7 +75,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       let foundUser: User | null = null;
       
       // Check password manually since we are storing it in the doc (as per requirements)
-      // In a pure Firebase Auth implementation, this would be signInWithEmailAndPassword
       querySnapshot.forEach((doc) => {
         const userData = doc.data() as User;
         if (userData.password === cleanPass) {
@@ -118,12 +116,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         const newId = `user_${Date.now()}`;
+        
+        // Strictly enforce 'auditor' role for public signups
         const newUser: User = {
             id: newId,
             name: data.name || 'User',
             email: cleanEmail,
             password: data.password || '',
-            role: 'auditor', // Enforce Auditor role
+            role: 'auditor', 
             governorate: (data as any).governorate || '',
             phone: (data as any).phone || '',
             specialization: (data as any).specialization || 'عام'
@@ -157,6 +157,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     // Simulate check
     try {
+        // Check local admins
+        if (SPECIAL_ADMINS.find(a => a.email.toLowerCase() === cleanEmail)) return true;
+
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('email', '==', cleanEmail));
         const snapshot = await getDocs(q);

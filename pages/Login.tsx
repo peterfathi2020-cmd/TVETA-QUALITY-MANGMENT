@@ -166,7 +166,7 @@ const Login: React.FC = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 pr-12 pl-4 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-right font-sans"
-                                placeholder="user@tveta.edu.eg"
+                                placeholder="user@gmail.com"
                                 required
                                 dir="ltr"
                             />
@@ -208,12 +208,16 @@ const Login: React.FC = () => {
                     </button>
 
                     <div className="mt-6 pt-6 border-t border-slate-700/50 text-center">
-                        <p className="text-slate-400 text-sm mb-3">ليس لديك حساب؟</p>
-                        <button type="button" onClick={() => setMode('signup')} className="w-full py-3 border border-slate-600 hover:border-blue-500 hover:text-blue-400 text-slate-300 rounded-2xl font-bold transition-all flex items-center justify-center gap-2">
+                        <p className="text-slate-400 text-sm mb-3">خاص بمراجعي الجودة</p>
+                        <button type="button" onClick={() => setMode('signup')} className="w-full py-3 border border-slate-600 hover:border-emerald-500 hover:text-emerald-400 text-slate-300 rounded-2xl font-bold transition-all flex items-center justify-center gap-2">
                             <UserPlus size={18} />
-                            إنشاء حساب مراجع جودة
+                            إنشاء حساب مراجع جودة جديد
                         </button>
-                        <p className="text-[10px] text-slate-500 mt-3">حسابات مديري القطاعات يتم إنشاؤها بواسطة الإدارة فقط.</p>
+                        <div className="bg-blue-900/20 p-3 rounded-xl mt-4 border border-blue-500/10">
+                            <p className="text-[10px] text-blue-300">
+                                <strong>تنبيه هام:</strong> حسابات مسؤولي القطاعات (Sector Managers) يتم إنشاؤها وإدارتها بواسطة إدارة النظام فقط ولا يمكن تسجيلها ذاتياً.
+                            </p>
+                        </div>
                     </div>
                 </form>
             )}
@@ -221,6 +225,10 @@ const Login: React.FC = () => {
             {/* SIGNUP FORM */}
             {mode === 'signup' && (
                 <form onSubmit={handleSignup} className="space-y-4 animate-fade-in">
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl mb-4 text-center">
+                        <p className="text-xs text-emerald-400 font-bold">هذا النموذج مخصص لتسجيل مراجعي الجودة فقط</p>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-3">
                          <div className="space-y-1">
                             <label className="text-xs font-bold text-slate-400 mr-1">الاسم بالكامل</label>
@@ -239,8 +247,8 @@ const Login: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-400 mr-1">البريد الإلكتروني (Gmail)</label>
-                        <div className="relative"><Mail className="absolute right-3 top-3 text-slate-500" size={16} /><input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-slate-800/50 border border-slate-700 text-white pr-9 pl-3 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none text-sm font-sans text-right" dir="ltr" /></div>
+                        <label className="text-xs font-bold text-slate-400 mr-1">البريد الإلكتروني (يفضل Gmail)</label>
+                        <div className="relative"><Mail className="absolute right-3 top-3 text-slate-500" size={16} /><input type="email" required value={newEmail} onChange={e => setNewEmail(e.target.value)} className="w-full bg-slate-800/50 border border-slate-700 text-white pr-9 pl-3 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none text-sm font-sans text-right" dir="ltr" placeholder="example@gmail.com" /></div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -264,7 +272,7 @@ const Login: React.FC = () => {
                         disabled={isSubmitting}
                         className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-lg py-3 rounded-2xl transition-all shadow-xl shadow-emerald-900/40 mt-4 flex items-center justify-center gap-3"
                     >
-                        {isSubmitting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>إنشاء الحساب</span>}
+                        {isSubmitting ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <span>تسجيل حساب مراجع</span>}
                     </button>
 
                     <button type="button" onClick={() => setMode('login')} className="w-full text-center text-slate-400 text-sm hover:text-white mt-2">
