@@ -55,9 +55,9 @@ const Dashboard: React.FC = () => {
 
   // --- Extract Available Years from Data ---
   const availableYears = useMemo(() => {
-    const years = new Set(visits.map(v => new Date(v.date).getFullYear()));
+    const years = new Set<number>(visits.map(v => new Date(v.date).getFullYear()));
     years.add(new Date().getFullYear()); // Ensure current year always exists
-    return Array.from(years).sort((a, b) => b - a);
+    return Array.from(years).sort((a: number, b: number) => b - a);
   }, [visits]);
 
   // --- Prepare Chart Data (Dynamic Year) ---

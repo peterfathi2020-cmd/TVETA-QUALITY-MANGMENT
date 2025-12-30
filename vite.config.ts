@@ -29,14 +29,25 @@ export default defineConfig(({ mode }) => {
         outDir: 'dist',
         sourcemap: false,
         minify: 'esbuild',
-        chunkSizeWarningLimit: 1600,
+        chunkSizeWarningLimit: 1000,
         rollupOptions: {
           output: {
-            manualChunks: {
-              vendor: ['react', 'react-dom', 'react-router-dom'],
-              charts: ['recharts'],
-              ui: ['lucide-react'],
-              firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage']
+            manualChunks: (id) => {
+              if (id.includes('node_modules')) {
+                if (id.includes('recharts')) {
+                  return 'charts';
+                }
+                if (id.includes('firebase')) {
+                  return 'firebase';
+                }
+                if (id.includes('react')) {
+                  return 'react-vendor';
+                }
+                if (id.includes('lucide')) {
+                  return 'icons';
+                }
+                return 'vendor'; // all other package goes here
+              }
             }
           }
         }

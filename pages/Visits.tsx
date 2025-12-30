@@ -1,13 +1,14 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { Visit } from '../types';
-import { Calendar as CalendarIcon, MapPin, CheckCircle, Clock, XCircle, Send, Navigation, Filter, AlertCircle, Printer, ArrowRight, Loader, LocateFixed, Eye, Activity, FileText, Plus, Edit, Trash2, Save, Mail, Mic, Camera, Aperture, ShieldCheck, Map, Share2 } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, CheckCircle, Clock, XCircle, Send, Navigation, Filter, AlertCircle, Printer, ArrowRight, Loader, LocateFixed, Eye, Activity, FileText, Plus, Edit, Trash2, Save, Mail, Mic, Camera, Aperture, ShieldCheck, Map, Share2, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { EGYPT_GOVERNORATES } from '../constants';
 import VisitCard from '../components/VisitCard';
 
 const STAGES = ['لم تبدأ', 'في الطريق', 'وصول للموقع', 'تفتيش القاعات', 'مراجعة المستندات', 'إعداد التقرير', 'تم الانتهاء'];
+const VISITS_PER_PAGE = 10;
 
 const Visits: React.FC = () => {
   const { user, hasPermission } = useAuth();
@@ -30,8 +31,20 @@ const Visits: React.FC = () => {
     } else if (user?.role === 'auditor' && user.relatedId) {
         result = visits.filter(v => v.auditorId === user.relatedId);
     }
-    return result;
+    // Sort by date desc
+    return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [visits, user]);
+
+  // Pagination State
+  const [visibleCount, setVisibleCount] = useState(VISITS_PER_PAGE);
+
+  const displayedVisits = useMemo(() => {
+    return filteredVisits.slice(0, visibleCount);
+  }, [filteredVisits, visibleCount]);
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + VISITS_PER_PAGE);
+  };
 
   // Local UI State
   const [activeVisit, setActiveVisit] = useState<Visit | null>(null); 
@@ -280,22 +293,33 @@ const Visits: React.FC = () => {
                <p>لا توجد زيارات مجدولة حالياً.</p>
              </div>
           ) : (
-            filteredVisits.map(visit => (
-              <VisitCard
-                key={visit.id}
-                visit={visit}
-                auditorName={getAuditorName(visit.auditorId)}
-                user={user}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                canUpdateProgress={canUpdateProgress}
-                onShare={handleShare}
-                onViewDetails={handleViewDetails}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeleteVisit}
-                onUpdate={handleOpenUpdate}
-              />
-            ))
+            <>
+              {displayedVisits.map(visit => (
+                <VisitCard
+                  key={visit.id}
+                  visit={visit}
+                  auditorName={getAuditorName(visit.auditorId)}
+                  user={user}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
+                  canUpdateProgress={canUpdateProgress}
+                  onShare={handleShare}
+                  onViewDetails={handleViewDetails}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDeleteVisit}
+                  onUpdate={handleOpenUpdate}
+                />
+              ))}
+              
+              {filteredVisits.length > visibleCount && (
+                <button 
+                  onClick={handleLoadMore}
+                  className="w-full py-3 bg-white border border-slate-200 text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-colors shadow-sm flex items-center justify-center gap-2"
+                >
+                  <ChevronDown size={20} /> عرض المزيد من الزيارات
+                </button>
+              )}
+            </>
           )}
         </div>
 

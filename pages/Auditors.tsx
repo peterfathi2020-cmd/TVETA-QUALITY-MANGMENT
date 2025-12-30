@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Auditor } from '../types';
-import { Plus, Search, Trash2, Edit, Star, Download, Filter, Upload, Share2, Shield, Map, Lock, UserCheck, Briefcase } from 'lucide-react';
+import { Plus, Search, Trash2, Edit, Star, Download, Filter, Upload, Share2, Shield, Map, Lock, UserCheck, Briefcase, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import { EGYPT_GOVERNORATES } from '../constants';
@@ -80,6 +80,8 @@ const AuditorRow: React.FC<AuditorRowProps> = React.memo(({ auditor, canManage, 
   );
 });
 
+const ITEMS_PER_PAGE = 15;
+
 const Auditors: React.FC = () => {
   const { user, hasPermission } = useAuth();
   const canCreate = hasPermission('create', 'auditors');
@@ -105,6 +107,7 @@ const Auditors: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [newAuditor, setNewAuditor] = useState<Partial<Auditor>>({});
   const [filterGov, setFilterGov] = useState('');
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   const handleSave = async () => {
     if (newAuditor.name && newAuditor.governorate) {
@@ -147,7 +150,7 @@ const Auditors: React.FC = () => {
     }
   };
 
-  const displayList = useMemo(() => {
+  const allFiltered = useMemo(() => {
     return filteredAuditors.filter(a => {
         const matchesGov = filterGov === '' || a.governorate === filterGov;
         const matchesSearch = a.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
@@ -155,8 +158,16 @@ const Auditors: React.FC = () => {
     });
   }, [filteredAuditors, filterGov, debouncedSearchTerm]);
 
+  const displayList = useMemo(() => {
+      return allFiltered.slice(0, visibleCount);
+  }, [allFiltered, visibleCount]);
+
+  const handleLoadMore = () => {
+      setVisibleCount(prev => prev + ITEMS_PER_PAGE);
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-10">
       {/* UI Code essentially identical, logic mapped to actions */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -242,6 +253,12 @@ const Auditors: React.FC = () => {
           </table>
         </div>
       </div>
+      
+      {allFiltered.length > visibleCount && (
+        <button onClick={handleLoadMore} className="w-full py-3 bg-white border border-slate-200 text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-colors shadow-sm flex items-center justify-center gap-2">
+            <ChevronDown size={20} /> عرض المزيد من المراجعين
+        </button>
+      )}
     </div>
   );
 };
