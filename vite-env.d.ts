@@ -1,14 +1,3 @@
-// Manually define Vite env types to avoid missing type definition errors
-interface ImportMetaEnv {
-  readonly VITE_FIREBASE_API_KEY: string;
-  readonly GEMINI_API_KEY: string;
-  [key: string]: string | undefined;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 declare namespace NodeJS {
   interface ProcessEnv {
     API_KEY: string;

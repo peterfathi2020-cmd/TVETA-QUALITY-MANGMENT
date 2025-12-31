@@ -13,7 +13,6 @@ export type Role = 'admin' | 'sector_manager' | 'auditor';
 export interface User {
   id: string;
   email: string;
-  password?: string; // Added for DB Auth
   name: string;
   role: Role;
   sector?: Sector; // For Managers

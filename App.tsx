@@ -1,4 +1,4 @@
-import React, { Component, Suspense, lazy, ReactNode } from 'react';
+import React, { Suspense, lazy, ReactNode } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
@@ -8,7 +8,7 @@ import Login from './pages/Login';
 
 // --- Error Boundary Component ---
 interface ErrorBoundaryProps {
-  children?: ReactNode;
+  children: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -16,8 +16,11 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { hasError: false, error: null };
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -92,7 +95,7 @@ const LoadingScreen = () => (
 
 // Performance Optimization: 
 // Only wrap authenticated routes with DataProvider. 
-const ProtectedRoute = ({ children }: { children?: ReactNode }) => {
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
@@ -107,7 +110,7 @@ const ProtectedRoute = ({ children }: { children?: ReactNode }) => {
 };
 
 // Admin Only Route Protection
-const AdminRoute = ({ children }: { children?: ReactNode }) => {
+const AdminRoute = ({ children }: { children: ReactNode }) => {
     const { user } = useAuth();
     if (user?.role !== 'admin') {
         return <Navigate to="/" />;
