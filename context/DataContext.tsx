@@ -1,10 +1,12 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useRef, useCallback } from 'react';
 import { 
   Visit, Auditor, ReportDocument, SupportMember, QualityOfficer, Template, EvaluationTemplate, EvaluationSubmission, DynamicFormTemplate, DynamicFormSubmission, AggregatedReport
 } from '../types';
 import app, { db } from '../services/firebase';
-import { collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy, writeBatch } from 'firebase/firestore';
+import { batchImportToFirestore } from '../services/backupService';
+import { SUPPORT_TEAM, QUALITY_OFFICERS } from '../constants';
 
 interface DataActions {
   saveVisit: (visit: Visit) => Promise<void>;
@@ -17,6 +19,8 @@ interface DataActions {
   saveOfficer: (officer: QualityOfficer) => Promise<void>;
   deleteOfficer: (id: number) => Promise<void>;
   saveFormTemplate: (form: DynamicFormTemplate) => Promise<void>;
+  saveFormSubmission: (submission: DynamicFormSubmission) => Promise<void>; // New Action
+  importData: (collectionName: string, data: any[]) => Promise<void>;
 }
 
 interface DataContextType {
@@ -52,12 +56,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isSyncing, setIsSyncing] = useState(true); // Default true to show loading initially
   const [lastSaved, setLastSaved] = useState(new Date());
 
-  // App State - Initialize EMPTY to prove real cloud connection
+  // App State - Initialize with constants to ensure data is present even before DB sync or if DB is empty
   const [visits, setVisits] = useState<Visit[]>([]);
   const [auditors, setAuditors] = useState<Auditor[]>([]);
   const [reports, setReports] = useState<ReportDocument[]>([]);
-  const [supportMembers, setSupportMembers] = useState<SupportMember[]>([]);
-  const [officers, setOfficers] = useState<QualityOfficer[]>([]);
+  const [supportMembers, setSupportMembers] = useState<SupportMember[]>(SUPPORT_TEAM);
+  const [officers, setOfficers] = useState<QualityOfficer[]>(QUALITY_OFFICERS);
   const [dynamicForms, setDynamicForms] = useState<DynamicFormTemplate[]>([]);
   
   // Non-persisted or less critical states
@@ -83,12 +87,9 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // Generic Subscribe Function
-  const subscribe = (collectionName: string, setter: any, orderByField?: string) => {
+  const subscribe = useCallback((collectionName: string, setter: any, orderByField?: string) => {
     let q = query(collection(db, collectionName));
     
-    // Apply sorting if requested (requires index in Firestore sometimes, but safe for small datasets)
-    // if (orderByField) { q = query(collection(db, collectionName), orderBy(orderByField, 'desc')); }
-
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const data: any[] = [];
       querySnapshot.forEach((doc) => {
@@ -102,7 +103,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
          }
       }
 
-      setter(data);
+      // Only update state if we received data, otherwise keep defaults (for support/officers)
+      if (data.length > 0 || (collectionName !== 'support' && collectionName !== 'officers')) {
+         setter(data);
+      }
+      
       setLastSaved(new Date());
       
       // Update loading status
@@ -117,7 +122,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       checkLoading();
     });
     return unsubscribe;
-  };
+  }, []);
 
   // Real-time Listeners
   useEffect(() => {
@@ -136,10 +141,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       unsubOfficers();
       unsubForms();
     };
-  }, []);
+  }, [subscribe]);
 
   // --- Actions (Direct Firestore CRUD) ---
-  const actions: DataActions = {
+  // Memoized actions to prevent re-creation on every render
+  const actions: DataActions = useMemo(() => ({
     saveVisit: async (visit: Visit) => {
       setIsSyncing(true);
       try {
@@ -193,10 +199,57 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     },
     saveFormTemplate: async (form: DynamicFormTemplate) => {
          setIsSyncing(true);
-         await setDoc(doc(db, 'dynamicForms', form.id), form);
-         setIsSyncing(false);
+         try {
+             // Remove undefined values which Firestore doesn't support
+             // JSON serialization strips undefined keys automatically
+             const sanitizedForm = JSON.parse(JSON.stringify(form));
+             await setDoc(doc(db, 'dynamicForms', form.id), sanitizedForm);
+         } catch (e) {
+             console.error("Error saving form template:", e);
+             throw e;
+         } finally {
+             setIsSyncing(false);
+         }
+    },
+    saveFormSubmission: async (submission: DynamicFormSubmission) => {
+        setIsSyncing(true);
+        try {
+            const sanitizedSubmission = JSON.parse(JSON.stringify(submission));
+            await setDoc(doc(db, 'dynamicSubmissions', submission.id), sanitizedSubmission);
+            
+            const reportDoc: ReportDocument = {
+                id: `smart_report_${submission.id}`,
+                title: `تقرير: ${submission.templateId} (مقدم من ${submission.userName})`,
+                type: 'Smart Form',
+                date: submission.submittedAt.split('T')[0],
+                governorate: submission.governorate,
+                status: 'Approved',
+                auditorId: submission.userId,
+                isSmartForm: true,
+                smartFormData: submission.answers,
+                url: submission.id 
+            };
+            const sanitizedReport = JSON.parse(JSON.stringify(reportDoc));
+            await setDoc(doc(db, 'reports', reportDoc.id), sanitizedReport);
+        } catch (e) {
+            console.error("Error saving submission", e);
+            throw e;
+        } finally {
+            setIsSyncing(false);
+        }
+    },
+    importData: async (collectionName: string, data: any[]) => {
+        setIsSyncing(true);
+        try {
+            await batchImportToFirestore(collectionName, data);
+        } catch(e) {
+            console.error(e);
+            throw e;
+        } finally {
+            setIsSyncing(false);
+        }
     }
-  };
+  }), []);
 
   const contextValue = useMemo(() => ({
       visits, auditors, reports, supportMembers, officers, templates, setTemplates,
@@ -205,7 +258,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }), [
       visits, auditors, reports, supportMembers, officers, templates, 
       evalTemplates, evalSubmissions, dynamicForms, dynamicSubmissions, aggregatedReports,
-      lastSaved, isSyncing
+      lastSaved, isSyncing, actions
   ]);
 
   return (

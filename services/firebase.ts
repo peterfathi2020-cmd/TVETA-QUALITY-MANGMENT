@@ -1,3 +1,4 @@
+
 import { initializeApp } from "firebase/app";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -14,7 +15,6 @@ const getFirebaseApiKey = () => {
   
   // 2. Try accessing via process.env (injected via define in vite.config.ts)
   // We use a direct check for the variable that Vite replaces at build time.
-  // Note: We avoid checking 'typeof process' explicitly to allow Vite's string replacement to work effectively.
   // @ts-ignore
   if (typeof process !== 'undefined' && process.env && process.env.FIREBASE_API_KEY) {
      // @ts-ignore
@@ -22,7 +22,6 @@ const getFirebaseApiKey = () => {
   }
 
   // 3. Fallback for replacement injection if process.env object isn't present but direct string replacement happened
-  // This looks weird but Vite might replace 'process.env.FIREBASE_API_KEY' with the string literal.
   try {
      // @ts-ignore
      return process.env.FIREBASE_API_KEY;
@@ -54,16 +53,21 @@ export const auth = getAuth(app);
 
 // Enable Offline Persistence (Real Cloud Feature)
 // This keeps the app working if internet cuts off, then syncs when back online
-try {
-  enableIndexedDbPersistence(db).catch((err) => {
+// Wrapped in an async IIFE to handle errors without blocking app initialization
+(async () => {
+  try {
+    await enableIndexedDbPersistence(db);
+    console.log("Firestore persistence enabled");
+  } catch (err: any) {
     if (err.code == 'failed-precondition') {
-        console.warn('Firestore persistence failed: Multiple tabs open');
+        // Multiple tabs open, persistence can only be enabled in one tab at a a time.
+        // This is expected behavior, not a critical error.
+        console.warn('Firestore persistence limited: Multiple tabs open. App will work in online mode in this tab.');
     } else if (err.code == 'unimplemented') {
-        console.warn('Firestore persistence not supported by browser');
+        // The current browser does not support all of the features required to enable persistence
+        console.warn('Firestore persistence not supported by this browser');
     }
-  });
-} catch (e) {
-  console.log("Persistence initialization skipped");
-}
+  }
+})();
 
 export default app;

@@ -1,6 +1,7 @@
+
 import React, { memo } from 'react';
 import { Visit, User } from '../types';
-import { Calendar as CalendarIcon, MapPin, CheckCircle, Clock, XCircle, LocateFixed, Share2, Eye, Edit, Trash2, Navigation } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, CheckCircle, Clock, XCircle, LocateFixed, Share2, Eye, Edit, Trash2, Navigation, Activity } from 'lucide-react';
 
 interface VisitCardProps {
   visit: Visit;
@@ -20,6 +21,7 @@ const getStatusBadge = (status: Visit['status']) => {
   switch (status) {
     case 'Completed': return <span className="flex items-center gap-1.5 text-green-700 bg-green-50 border border-green-100 px-3 py-1 rounded-full text-xs font-medium"><CheckCircle size={14} /> تم التنفيذ</span>;
     case 'Planned': return <span className="flex items-center gap-1.5 text-blue-700 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full text-xs font-medium"><Clock size={14} /> مخطط</span>;
+    case 'In Progress': return <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full text-xs font-medium"><Activity size={14} /> جاري التنفيذ</span>;
     case 'Cancelled': return <span className="flex items-center gap-1.5 text-red-700 bg-red-50 border border-red-100 px-3 py-1 rounded-full text-xs font-medium"><XCircle size={14} /> ملغى</span>;
   }
 };
@@ -37,6 +39,13 @@ const VisitCard: React.FC<VisitCardProps> = memo(({
   onDelete, 
   onUpdate 
 }) => {
+  
+  // Logic to determine if user can update progress (Admin, Manager, or Assigned Auditor)
+  const isAssigned = user && (visit.auditorId === user.id || visit.auditorId === user.relatedId);
+  
+  // Update allowed if user has permission AND (is Admin OR Manager OR Assigned Auditor)
+  const canUpdate = canUpdateProgress && (user?.role === 'admin' || user?.role === 'sector_manager' || isAssigned);
+
   return (
     <div className="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 hover:border-blue-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group relative overflow-hidden">
       <div className="absolute bottom-0 left-0 h-1 bg-slate-100 w-full">
@@ -110,13 +119,13 @@ const VisitCard: React.FC<VisitCardProps> = memo(({
                   </button>
                 )}
                 
-                {/* Only show update button if user has permission AND is the assigned auditor (or admin) */}
-                {canUpdateProgress && !canEdit && (user?.role === 'admin' || visit.auditorId === user?.relatedId) && (
+                {/* Update Progress Button - Available for Admin, Manager, and Assigned Auditor */}
+                {canUpdate && (
                     <button 
                     onClick={() => onUpdate(visit)}
                     className="flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg text-sm font-bold transition shadow-lg shadow-blue-600/20"
                   >
-                    <Navigation size={16} /> تحديث وإرسال الموقع
+                    <Navigation size={16} /> تحديث / موقع
                   </button>
                 )}
         </div>

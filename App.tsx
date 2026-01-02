@@ -1,14 +1,15 @@
-import React, { Suspense, lazy, ReactNode } from 'react';
+import React, { Component, Suspense, lazy, ReactNode, ErrorInfo } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Login from './pages/Login';
 
 // --- Error Boundary Component ---
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -16,31 +17,38 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState;
+  public props: ErrorBoundaryProps;
+
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.props = props;
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
-          <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-rose-100">
+        <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 p-6 text-center">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl max-w-md w-full border border-rose-100 dark:border-rose-900">
             <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-600">
               <AlertTriangle size={32} />
             </div>
-            <h2 className="text-2xl font-black text-slate-800 mb-2">حدث خطأ غير متوقع</h2>
-            <p className="text-slate-500 mb-6">نواجه مشكلة في تحميل التطبيق على جهازك. يرجى التأكد من تحديث المتصفح والمحاولة مرة أخرى.</p>
-            <div className="bg-slate-50 p-3 rounded-lg text-left text-xs text-slate-400 font-mono mb-6 overflow-hidden">
+            <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">حدث خطأ غير متوقع</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">نواجه مشكلة في تحميل التطبيق على جهازك. يرجى التأكد من تحديث المتصفح والمحاولة مرة أخرى.</p>
+            <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg text-left text-xs text-slate-400 font-mono mb-6 overflow-hidden">
                {this.state.error?.message}
             </div>
             <button 
@@ -54,7 +62,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    return this.props.children;
+    return this.props.children || null;
   }
 }
 
@@ -85,17 +93,18 @@ const Visits = lazyRetry(() => import('./pages/Visits'));
 const Reports = lazyRetry(() => import('./pages/Reports'));
 const AIAssistant = lazyRetry(() => import('./pages/AIAssistant'));
 const SystemBackup = lazyRetry(() => import('./pages/SystemBackup'));
+const DriveManager = lazyRetry(() => import('./pages/DriveManager')); // New Page
 
 const LoadingScreen = () => (
   <div className="h-full min-h-[500px] w-full flex items-center justify-center flex-col gap-4">
     <Loader2 className="animate-spin text-blue-500" size={40} />
-    <p className="text-slate-500 font-medium animate-pulse text-sm">جاري تحميل البيانات...</p>
+    <p className="text-slate-500 dark:text-slate-400 font-medium animate-pulse text-sm">جاري تحميل البيانات...</p>
   </div>
 );
 
 // Performance Optimization: 
 // Only wrap authenticated routes with DataProvider. 
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+const ProtectedRoute = ({ children }: { children?: ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
@@ -109,8 +118,17 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// Redirect to Dashboard if already authenticated
+const PublicRoute = ({ children }: { children?: ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+};
+
 // Admin Only Route Protection
-const AdminRoute = ({ children }: { children: ReactNode }) => {
+const AdminRoute = ({ children }: { children?: ReactNode }) => {
     const { user } = useAuth();
     if (user?.role !== 'admin') {
         return <Navigate to="/" />;
@@ -121,7 +139,7 @@ const AdminRoute = ({ children }: { children: ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route
         path="/*"
         element={
@@ -137,6 +155,7 @@ const AppRoutes = () => {
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/ai-assistant" element={<AIAssistant />} />
                   <Route path="/backup" element={<AdminRoute><SystemBackup /></AdminRoute>} />
+                  <Route path="/drive" element={<AdminRoute><DriveManager /></AdminRoute>} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>
@@ -151,11 +170,13 @@ const AppRoutes = () => {
 const App = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <HashRouter>
-          <AppRoutes />
-        </HashRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <HashRouter>
+            <AppRoutes />
+          </HashRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };

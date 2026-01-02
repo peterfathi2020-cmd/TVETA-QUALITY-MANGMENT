@@ -5,7 +5,8 @@ export enum Sector {
   CentralDelta = "وسط الدلتا",
   Cairo = "القاهرة",
   UpperEgypt = "الصعيد",
-  IT = "مسئول IT"
+  IT = "مسئول IT",
+  WorkshopCoordinator = "منسق ورش العمل"
 }
 
 export type Role = 'admin' | 'sector_manager' | 'auditor';
@@ -13,11 +14,15 @@ export type Role = 'admin' | 'sector_manager' | 'auditor';
 export interface User {
   id: string;
   email: string;
+  password?: string; // Added for DB Auth
   name: string;
   role: Role;
   sector?: Sector; // For Managers
   relatedId?: string; // To link User to Auditor/Officer ID
   governorates?: string[]; // Specific governorates allowed for this user
+  phone?: string;
+  governorate?: string;
+  specialization?: string;
 }
 
 export interface SupportMember {
@@ -45,18 +50,28 @@ export interface Auditor {
   rating: number; 
 }
 
+export interface VisitAttachment {
+  id: string;
+  type: 'image' | 'audio' | 'file';
+  url: string; // Base64 string or URL
+  name?: string; // Filename
+  timestamp: string;
+}
+
 export interface Visit {
   id: string;
   auditorId: string;
   location: string; 
   date: string;
-  status: 'Planned' | 'Completed' | 'Cancelled';
+  status: 'Planned' | 'In Progress' | 'Completed' | 'Cancelled';
   governorate: string;
   // Persisted Progress Fields
   progress?: number; 
   currentStage?: string;
   fieldNotes?: string;
   locationCoords?: { lat: number; lng: number; timestamp: string };
+  attachments?: VisitAttachment[];
+  linkedReportId?: string; // ID of the smart form submission or uploaded report
 }
 
 export interface Template {
@@ -83,6 +98,10 @@ export interface ReportDocument {
   governorate: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   auditorId?: string; // Linked to the creator
+  url?: string; // URL for File or ID for Smart Form
+  isSmartForm?: boolean; // Flag to identify smart forms
+  smartFormData?: any; // The actual data of the smart form
+  visitId?: string; // Optional link to a visit
 }
 
 // --- New Evaluation System Types ---
@@ -136,6 +155,8 @@ export interface DynamicFormSubmission {
   userName: string;
   submittedAt: string;
   answers: Record<string, string | number | boolean>; // fieldId -> value
+  governorate: string;
+  visitId?: string; // Linked visit
 }
 
 // --- Aggregated Reports (New Feature) ---
@@ -211,4 +232,11 @@ export interface Defect {
   createdAt: string;
   aiAnalysis?: string;
   aiRecommendation?: string;
+}
+
+export interface GoogleDriveFile {
+  id: string;
+  name: string;
+  webViewLink: string;
+  mimeType: string;
 }

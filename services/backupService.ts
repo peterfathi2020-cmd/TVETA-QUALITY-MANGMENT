@@ -46,7 +46,7 @@ export const backupSystemData = (allData: any) => {
   downloadFile(JSON.stringify(backup, null, 2), `TVETA_System_Backup_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
 };
 
-// 3. Restore Data to Firebase
+// 3. Restore Data to Firebase (JSON Backup)
 export const restoreSystemData = async (jsonFile: File, onProgress: (msg: string) => void): Promise<void> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -57,55 +57,34 @@ export const restoreSystemData = async (jsonFile: File, onProgress: (msg: string
         
         if (!parsed.data) throw new Error("Invalid Backup File Format");
 
-        const batch = writeBatch(db);
-        let operationCount = 0;
-        const BATCH_LIMIT = 450; // Firebase limit is 500
+        // Use batch chunks (limit 500 ops per batch)
+        const chunks: any[][] = [];
+        const allItems: { coll: string, data: any }[] = [];
 
-        // Process Visits
-        if (parsed.data.visits) {
-            parsed.data.visits.forEach((item: any) => {
-                const ref = doc(db, 'visits', item.id);
-                batch.set(ref, item);
-                operationCount++;
+        // Collect all operations
+        if (parsed.data.visits) parsed.data.visits.forEach((d: any) => allItems.push({coll: 'visits', data: d}));
+        if (parsed.data.auditors) parsed.data.auditors.forEach((d: any) => allItems.push({coll: 'auditors', data: d}));
+        if (parsed.data.supportMembers) parsed.data.supportMembers.forEach((d: any) => allItems.push({coll: 'support', data: d}));
+        if (parsed.data.officers) parsed.data.officers.forEach((d: any) => allItems.push({coll: 'officers', data: d}));
+        if (parsed.data.reports) parsed.data.reports.forEach((d: any) => allItems.push({coll: 'reports', data: d}));
+
+        // Split into chunks of 450
+        for (let i = 0; i < allItems.length; i += 450) {
+            chunks.push(allItems.slice(i, i + 450));
+        }
+
+        onProgress(`جاري استعادة ${allItems.length} سجل...`);
+
+        // Execute batches sequentially
+        for (const chunk of chunks) {
+            const batch = writeBatch(db);
+            chunk.forEach(item => {
+                const ref = doc(db, item.coll, item.data.id.toString());
+                batch.set(ref, item.data);
             });
-            onProgress(`تم تجهيز ${parsed.data.visits.length} زيارة للاستعادة...`);
+            await batch.commit();
         }
 
-        // Process Auditors
-        if (parsed.data.auditors) {
-            parsed.data.auditors.forEach((item: any) => {
-                const ref = doc(db, 'auditors', item.id);
-                batch.set(ref, item);
-                operationCount++;
-            });
-            onProgress(`تم تجهيز ${parsed.data.auditors.length} مراجع للاستعادة...`);
-        }
-
-        // Process Team
-        if (parsed.data.supportMembers) {
-             parsed.data.supportMembers.forEach((item: any) => {
-                const ref = doc(db, 'support', item.id.toString());
-                batch.set(ref, item);
-                operationCount++;
-            });
-        }
-        
-         // Process Reports
-        if (parsed.data.reports) {
-             parsed.data.reports.forEach((item: any) => {
-                const ref = doc(db, 'reports', item.id);
-                batch.set(ref, item);
-                operationCount++;
-            });
-        }
-
-        if (operationCount > BATCH_LIMIT) {
-             // In a real production app, we would split into multiple batches here.
-             // For this demo, we assume data fits or we'd implement chunking.
-             onProgress("تنبيه: حجم البيانات كبير، جاري الاستعادة...");
-        }
-
-        await batch.commit();
         onProgress("تمت استعادة البيانات بنجاح إلى السحابة!");
         resolve();
 
@@ -115,4 +94,61 @@ export const restoreSystemData = async (jsonFile: File, onProgress: (msg: string
     };
     reader.readAsText(jsonFile);
   });
+};
+
+// 4. Import from CSV (Excel)
+export const parseCSV = (file: File): Promise<any[]> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target?.result as string;
+            if (!text) return resolve([]);
+            
+            const rows = text.split('\n').filter(r => r.trim() !== '');
+            const headers = rows[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            
+            const data = rows.slice(1).map(row => {
+                // Corrected Regex to handle quoted CSV fields correctly
+                const regex = /(?:,|^)("(?:""|[^"])*"|[^",]*)/g;
+                const matches: string[] = [];
+                let match;
+                while ((match = regex.exec(row))) {
+                    let val = match[1] || '';
+                    if (val.startsWith('"') && val.endsWith('"')) {
+                        val = val.slice(1, -1).replace(/""/g, '"');
+                    }
+                    matches.push(val.trim());
+                }
+                
+                const cols = matches.length > 0 ? matches : row.split(',');
+                
+                const obj: any = {};
+                headers.forEach((h, i) => {
+                    if (cols[i] !== undefined) obj[h] = cols[i];
+                });
+                return obj;
+            });
+            resolve(data);
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsText(file);
+    });
+};
+
+export const batchImportToFirestore = async (collectionName: string, data: any[]) => {
+    const chunks: any[][] = [];
+    for (let i = 0; i < data.length; i += 450) {
+        chunks.push(data.slice(i, i + 450));
+    }
+
+    for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(item => {
+            // Ensure ID exists
+            const id = item.id || doc(collection(db, collectionName)).id; 
+            const ref = doc(db, collectionName, id.toString());
+            batch.set(ref, { ...item, id });
+        });
+        await batch.commit();
+    }
 };

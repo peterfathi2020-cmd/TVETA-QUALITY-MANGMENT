@@ -21,22 +21,36 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
+        // Only define process.env for compatibility. Do NOT redefine import.meta.env here.
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || process.env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || process.env.GEMINI_API_KEY),
-        'process.env.FIREBASE_API_KEY': JSON.stringify(env.VITE_FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY)
+        'process.env.FIREBASE_API_KEY': JSON.stringify(env.VITE_FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY),
+        'process.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(env.VITE_GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID),
+        'process.env.VITE_GOOGLE_API_KEY': JSON.stringify(env.VITE_GOOGLE_API_KEY || process.env.VITE_GOOGLE_API_KEY),
       },
       build: {
         outDir: 'dist',
         sourcemap: false,
         minify: 'esbuild',
-        chunkSizeWarningLimit: 1600,
+        chunkSizeWarningLimit: 1000,
         rollupOptions: {
           output: {
-            manualChunks: {
-              vendor: ['react', 'react-dom', 'react-router-dom'],
-              charts: ['recharts'],
-              ui: ['lucide-react'],
-              firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage']
+            manualChunks: (id) => {
+              if (id.includes('node_modules')) {
+                if (id.includes('recharts')) {
+                  return 'charts';
+                }
+                if (id.includes('firebase')) {
+                  return 'firebase';
+                }
+                if (id.includes('react')) {
+                  return 'react-vendor';
+                }
+                if (id.includes('lucide')) {
+                  return 'icons';
+                }
+                return 'vendor'; // all other package goes here
+              }
             }
           }
         }

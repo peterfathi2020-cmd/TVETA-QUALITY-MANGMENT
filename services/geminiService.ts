@@ -7,7 +7,6 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const analyzeAuditFindings = async (findings: string): Promise<string> => {
   try {
-    // Fix: Use gemini-3-pro-preview for complex reasoning and move persona to systemInstruction
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: `قم بتحليل الملاحظات التالية واقترح إجراءات تصحيحية (Corrective Actions) وتصنيفها حسب الخطورة: \n\n ${findings}`,
@@ -25,7 +24,6 @@ export const analyzeAuditFindings = async (findings: string): Promise<string> =>
 
 export const getQualityAdvice = async (query: string): Promise<string> => {
   try {
-    // Fix: Upgrade to gemini-3-pro-preview for expert QMS advisory
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: query,
@@ -33,7 +31,6 @@ export const getQualityAdvice = async (query: string): Promise<string> => {
         systemInstruction: "أنت مساعد ذكي متخصص في أنظمة إدارة الجودة (QMS) والمراجعة الداخلية والخارجية. أجب باللغة العربية بمهنية واحترافية.",
       },
     });
-    // Explicitly casting or checking to ensure a string is always returned for TS safety
     const text = response.text;
     return text ? text : "عذراً، لم أتمكن من إنشاء إجابة في الوقت الحالي.";
   } catch (error) {
@@ -106,5 +103,76 @@ export const analyzeDefect = async (description: string, context: string) => {
       analysis: "Could not perform analysis at this time.", 
       recommendation: "Please review manually." 
     };
+  }
+};
+
+// --- Smart Document Analysis ---
+export const analyzeDocumentImage = async (base64Image: string): Promise<{ title?: string; governorate?: string }> => {
+  try {
+    // Note: 'gemini-3-flash-preview' supports multimodal input (images + text)
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: {
+        parts: [
+          { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
+          { text: "Analyze this official report document. Extract the 'title' (Subject of the report) and the 'governorate' (Egyptian Governorate name) if mentioned. If not found, return empty strings. Return JSON." }
+        ]
+      },
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            governorate: { type: Type.STRING }
+          }
+        }
+      }
+    });
+
+    return JSON.parse(response.text || '{}');
+  } catch (error) {
+    console.error("Gemini Document Analysis Error:", error);
+    return {};
+  }
+};
+
+// --- NEW: Smart Form Generator ---
+export const generateSmartFormSchema = async (topic: string): Promise<any> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: `Create a data collection form schema for: ${topic}. Include a title, description, and a list of fields. Fields should have labels, types (text, number, date, select, checkbox, textarea), and options if type is select.`,
+      config: {
+        systemInstruction: "You are a Form Designer. Generate a JSON schema for a dynamic form. Ensure field types are strictly one of: 'text', 'number', 'date', 'textarea', 'select', 'checkbox'. Use Arabic for labels.",
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            description: { type: Type.STRING },
+            fields: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  label: { type: Type.STRING },
+                  type: { type: Type.STRING },
+                  required: { type: Type.BOOLEAN },
+                  options: { type: Type.ARRAY, items: { type: Type.STRING } }
+                },
+                required: ["label", "type", "required"]
+              }
+            }
+          },
+          required: ["title", "description", "fields"]
+        }
+      }
+    });
+
+    return JSON.parse(response.text || '{}');
+  } catch (error) {
+    console.error("Gemini Form Generation Error:", error);
+    return null;
   }
 };
