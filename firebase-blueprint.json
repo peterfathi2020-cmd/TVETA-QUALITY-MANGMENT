@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "systemSettings": {
+      "title": "System Settings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "autoBackupVisitsArchive": {
+          "type": "boolean",
+          "description": "Whether to automatically backup visit attachments to Google Drive"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["autoBackupVisitsArchive"]
+    },
+    "user": {
+      "title": "User Profile",
+      "description": "Application user profile",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "sector_manager", "auditor"] },
+        "governorate": { "type": "string" },
+        "phone": { "type": "string" },
+        "lastSeen": { "type": "integer", "description": "Timestamp of last activity" }
+      },
+      "required": ["name", "email", "role"]
+    }
+  },
+  "firestore": {
+    "system/settings": {
+      "schema": "systemSettings",
+      "description": "Main system configuration document"
+    },
+    "users/{userId}": {
+      "schema": "user",
+      "description": "Individual user profiles"
+    }
+  }
+}

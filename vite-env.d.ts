@@ -1,5 +1,14 @@
 
+/// <reference types="vite-plugin-pwa/client" />
+
 // Manually define Vite env types to avoid missing type definition errors
+interface Window {
+  aistudio: {
+    hasSelectedApiKey: () => Promise<boolean>;
+    openSelectKey: () => Promise<void>;
+  };
+}
+
 interface ImportMetaEnv {
   readonly VITE_FIREBASE_API_KEY: string;
   readonly GEMINI_API_KEY: string;

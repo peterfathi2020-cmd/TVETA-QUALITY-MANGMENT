@@ -1,0 +1,111 @@
+[debug] [2026-07-30T10:22:47.845Z] ----------------------------------------------------------------------
+[debug] [2026-07-30T10:22:47.855Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\KM\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
+[debug] [2026-07-30T10:22:47.856Z] CLI Version:   15.25.0
+[debug] [2026-07-30T10:22:47.857Z] Platform:      win32
+[debug] [2026-07-30T10:22:47.858Z] Node Version:  v24.15.0
+[debug] [2026-07-30T10:22:47.858Z] Detected Agent: unknown
+[debug] [2026-07-30T10:22:47.859Z] Time:          Thu Jul 30 2026 13:22:47 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-07-30T10:22:47.859Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-30T10:22:47.943Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-30T10:23:01.828Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-30T10:23:01.829Z] > authorizing via signed-in user (peterfathi2020@gmail.com)
+[debug] [2026-07-30T10:23:01.829Z] [iam] checking project tveta-quality for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-30T10:23:01.834Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:01.835Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:01.836Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:23:01.842Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:23:01.842Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:02.199Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:23:02.200Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:02.200Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions [none]
+[debug] [2026-07-30T10:23:02.201Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions  x-goog-user-project=tveta-quality
+[debug] [2026-07-30T10:23:02.201Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-07-30T10:23:02.421Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-07-30T10:23:02.421Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-07-30T10:23:03.020Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions 401
+[debug] [2026-07-30T10:23:03.020Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2026-07-30T10:23:03.021Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-07-30T10:23:03.021Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.021Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.021Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:23:03.024Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:23:03.024Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.113Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:23:03.113Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.117Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2026-07-30T10:23:03.119Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.119Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.119Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:23:03.121Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:23:03.121Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.213Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:23:03.214Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.214Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality [none]
+[debug] [2026-07-30T10:23:03.537Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality 401
+[debug] [2026-07-30T10:23:03.537Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-07-30T10:23:03.537Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-07-30T10:23:03.537Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.538Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:23:03.538Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:23:03.540Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:23:03.540Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.632Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:23:03.633Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:23:03.634Z] Request to https://firebase.googleapis.com/v1beta1/projects/tveta-quality had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
+[debug] [2026-07-30T10:24:08.669Z] ----------------------------------------------------------------------
+[debug] [2026-07-30T10:24:08.679Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\KM\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-07-30T10:24:08.680Z] CLI Version:   15.25.0
+[debug] [2026-07-30T10:24:08.681Z] Platform:      win32
+[debug] [2026-07-30T10:24:08.682Z] Node Version:  v24.15.0
+[debug] [2026-07-30T10:24:08.682Z] Detected Agent: unknown
+[debug] [2026-07-30T10:24:08.683Z] Time:          Thu Jul 30 2026 13:24:08 GMT+0300 (Eastern European Summer Time)
+[debug] [2026-07-30T10:24:08.683Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-30T10:24:17.294Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-30T10:24:17.296Z] > authorizing via signed-in user (peterfathi2020@gmail.com)
+[debug] [2026-07-30T10:24:17.297Z] [iam] checking project tveta-quality for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-30T10:24:17.359Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:17.360Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:17.361Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:24:17.372Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:24:17.373Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:17.745Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:24:17.745Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:17.746Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions [none]
+[debug] [2026-07-30T10:24:17.747Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions  x-goog-user-project=tveta-quality
+[debug] [2026-07-30T10:24:17.748Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-07-30T10:24:18.568Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions 401
+[debug] [2026-07-30T10:24:18.568Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"service":"cloudresourcemanager.googleapis.com","method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions"}}]}}
+[debug] [2026-07-30T10:24:18.569Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-07-30T10:24:18.569Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:18.569Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:18.569Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:24:18.572Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:24:18.572Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:18.677Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:24:18.677Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:18.681Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/tveta-quality:testIamPermissions had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2026-07-30T10:24:18.684Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:18.684Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:18.684Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:24:18.686Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:24:18.686Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:18.804Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:24:18.805Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:18.806Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality [none]
+[debug] [2026-07-30T10:24:19.546Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality 401
+[debug] [2026-07-30T10:24:19.546Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tveta-quality {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-07-30T10:24:19.546Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-07-30T10:24:19.547Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:19.547Z] Checked if tokens are valid: false, expires at: 1779738730786
+[debug] [2026-07-30T10:24:19.547Z] > refreshing access token with scopes: []
+[debug] [2026-07-30T10:24:19.549Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-07-30T10:24:19.549Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:19.631Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-07-30T10:24:19.631Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-07-30T10:24:19.633Z] Request to https://firebase.googleapis.com/v1beta1/projects/tveta-quality had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier

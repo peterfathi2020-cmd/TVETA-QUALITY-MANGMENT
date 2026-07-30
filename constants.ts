@@ -1,5 +1,5 @@
 
-import { SupportMember, QualityOfficer, Sector, Auditor, Visit, PerformanceReport, ReportDocument } from './types';
+import { SupportMember, QualityOfficer, Sector, Auditor, Visit, PerformanceReport, ReportDocument, Trainer } from './types';
 
 export const EGYPT_GOVERNORATES = [
   "الإسكندرية", "الإسماعيلية", "أسوان", "أسيوط", "الأقصر", "البحر الأحمر", "البحيرة", "بني سويف", "بورسعيد", 
@@ -7,13 +7,21 @@ export const EGYPT_GOVERNORATES = [
   "الفيوم", "القاهرة", "القليوبية", "قنا", "كفر الشيخ", "مطروح", "المنوفية", "المنيا", "الوادي الجديد"
 ];
 
+export const EDUCATION_TYPES = [
+  "صناعي",
+  "زراعي",
+  "تجاري",
+  "فندقي",
+  "عام"
+];
+
 // Mapping Sectors to Governorates for Logic
 export const SECTOR_GOVERNORATES_MAP: Record<Sector, string[]> = {
-  [Sector.WestDelta]: ["البحيرة", "مطروح", "الإسكندرية", "دمياط", "بورسعيد", "الغربية", "كفر الشيخ"],
-  [Sector.CanalSinai]: ["الإسماعيلية", "جنوب سيناء", "شمال سيناء"],
-  [Sector.CentralDelta]: ["الدقهلية", "القليوبية", "المنوفية", "الشرقية", "السويس", "بني سويف"],
-  [Sector.Cairo]: ["الجيزة", "القاهرة", "الفيوم"],
-  [Sector.UpperEgypt]: ["الوادي الجديد", "المنيا", "سوهاج", "أسيوط", "أسوان", "البحر الأحمر", "قنا", "الأقصر"],
+  [Sector.WestDelta]: ["البحيرة", "مطروح", "الإسكندرية", "بورسعيد"],
+  [Sector.CanalSinai]: ["السويس", "الإسماعيلية", "جنوب سيناء", "شمال سيناء", "البحر الأحمر", "دمياط"],
+  [Sector.CentralDelta]: ["الدقهلية", "المنوفية", "الغربية", "كفر الشيخ", "الشرقية"],
+  [Sector.Cairo]: ["الجيزة", "القاهرة", "الفيوم", "بني سويف", "القليوبية", "المنيا"],
+  [Sector.UpperEgypt]: ["الوادي الجديد", "سوهاج", "أسيوط", "أسوان", "قنا", "الأقصر"],
   [Sector.IT]: [],
   [Sector.WorkshopCoordinator]: []
 };
@@ -22,73 +30,59 @@ export const SECTOR_GOVERNORATES_MAP: Record<Sector, string[]> = {
 export const SUPPORT_TEAM: SupportMember[] = [
   { 
     id: 1, 
-    name: "شيرين على جاد احمد سالم", 
-    phone: "01145643006", 
+    name: "يمني يسرى علي حسن", 
+    phone: "01003929767", 
     sector: Sector.WestDelta, 
-    governorates: ["البحيرة", "مطروح", "الإسكندرية", "دمياط"] 
+    governorates: ["البحيرة", "مطروح", "الإسكندرية", "بورسعيد"] 
   },
   { 
     id: 2, 
-    name: "أميمة مسعد مهدي شلبي", 
-    phone: "01554771947", 
-    sector: Sector.WestDelta, 
-    governorates: ["بورسعيد", "الغربية", "كفر الشيخ"] 
+    name: "منى علي محمد العشري", 
+    phone: "01066558912", 
+    sector: Sector.CanalSinai, 
+    governorates: ["السويس", "الإسماعيلية", "جنوب سيناء", "شمال سيناء", "البحر الأحمر", "دمياط"] 
   },
   { 
     id: 3, 
-    name: "نعمه سعد عبد الرحمن محمد", 
-    phone: "01278200038", 
-    sector: Sector.CanalSinai, 
-    governorates: ["الإسماعيلية", "جنوب سيناء", "شمال سيناء"] 
-  },
-  { 
-    id: 4, 
-    name: "مني علي محمد العشري", 
-    phone: "01066558912", 
-    sector: Sector.UpperEgypt, 
-    governorates: ["أسوان", "البحر الأحمر", "قنا", "الأقصر"] 
-  },
-  { 
-    id: 5, 
     name: "رشا محمود حماد حمزه", 
     phone: "01024860168", 
     sector: Sector.CentralDelta, 
-    governorates: ["الدقهلية", "القليوبية", "المنوفية"] 
+    governorates: ["الدقهلية", "المنوفية", "الغربية", "كفر الشيخ", "الشرقية"] 
   },
   { 
-    id: 6, 
-    name: "يمني يسرى علي حسن", 
-    phone: "01003929767", 
-    sector: Sector.CentralDelta, 
-    governorates: ["الشرقية", "السويس", "بني سويف"] 
-  },
-  { 
-    id: 7, 
+    id: 4, 
     name: "يارا حمدى محمد عفيفى شاكر", 
     phone: "01096806661", 
     sector: Sector.Cairo, 
-    governorates: ["الجيزة", "القاهرة", "الفيوم"] 
+    governorates: ["الجيزة", "القاهرة", "الفيوم", "بني سويف", "القليوبية", "المنيا"] 
   },
   { 
-    id: 8, 
+    id: 5, 
     name: "محمد فؤاد احمد", 
     phone: "01002001958", 
     sector: Sector.UpperEgypt, 
-    governorates: ["الوادي الجديد", "المنيا", "سوهاج", "أسيوط"] 
+    governorates: ["الوادي الجديد", "سوهاج", "أسيوط", "أسوان", "قنا", "الأقصر"] 
   },
   { 
-    id: 9, 
+    id: 6, 
     name: "بيتر فتحي حليم ابسخرون", 
     phone: "01200724259", 
     sector: Sector.IT, 
-    governorates: [] // مسئول IT
+    governorates: [] 
   },
   { 
-    id: 10, 
+    id: 7, 
     name: "اسامة محمد عبده على سويفى", 
     phone: "01012850998", 
     sector: Sector.WorkshopCoordinator, 
-    governorates: [] // منسق ورش العمل
+    governorates: [] 
+  },
+  { 
+    id: 8, 
+    name: "هيام حسيني ابراهيم", 
+    phone: "01220784649", 
+    sector: Sector.WorkshopCoordinator, 
+    governorates: [] 
   }
 ];
 
@@ -145,3 +139,97 @@ export const PERFORMANCE_DATA: PerformanceReport[] = [
 export const MOCK_REPORTS: ReportDocument[] = [
   { id: 'r1', title: 'تقرير الأداء الشهري - أكتوبر', type: 'تقرير شهري', date: '2023-10-31', governorate: 'القاهرة', status: 'Approved', auditorId: '1' },
 ];
+
+export const INITIAL_TRAINERS: Trainer[] = [
+  {
+    id: "1",
+    name: "محمد السيد محمد أبوشبانه",
+    governorate: "البحيرة",
+    type: "صناعي",
+    specialization: "الصناعات المعمارية",
+    job: "معلم خبير ..مدرسة أبوحمص ث ص بنين",
+    nationalId: "27509171800279",
+    phone: "01224650288",
+    qualification: "دبلوم مهني/ خاص",
+    hasTot: true,
+    accreditation: "معتمد",
+    performance: "متميز",
+    participation: "مشارك / متعاون"
+  },
+  {
+    id: "2",
+    name: "عزه احمد محمد على نصار",
+    governorate: "الشرقية",
+    type: "تجاري",
+    specialization: "قانون",
+    job: "معلم اول ا مدرسه التجاره الجديده المشتركه بالزقازيق",
+    nationalId: "27511081300042",
+    phone: "01208176029",
+    qualification: "بكالوريوس",
+    hasTot: true,
+    accreditation: "معتمد",
+    performance: "متميز",
+    participation: "مشارك / متعاون"
+  },
+  {
+    id: "3",
+    name: "احمد محمود عبدالحميد ابوركبه",
+    governorate: "الإسكندرية",
+    type: "صناعي",
+    specialization: "ميكانيكا",
+    job: "معلم ميكانيكا بمدرسة الراس السوداء الصناعية",
+    nationalId: "27002111800493",
+    phone: "01224340755",
+    qualification: "دبلوم مهني/ خاص",
+    hasTot: true,
+    accreditation: "غير معتمد",
+    performance: "يحتاج الي تدريب واعادة تأهيل",
+    participation: "لم يتم تكليفه"
+  },
+  {
+    id: "4",
+    name: "ايمان ابراهيم السيد عطيه",
+    governorate: "الإسكندرية",
+    type: "صناعي",
+    specialization: "ملابس جاهزه",
+    job: "معلم اول بمدرسة الشهيد محمد نعيم",
+    nationalId: "28001180201469",
+    phone: "1271950760",
+    qualification: "بكالوريوس",
+    hasTot: true,
+    accreditation: "معتمد",
+    performance: "مقبول",
+    participation: "لم يتم تكليفه"
+  },
+  {
+    id: "5",
+    name: "شاكره مبروك احمد عبدالرحمن",
+    governorate: "الشرقية",
+    type: "صناعي",
+    specialization: "ميكانيكا نظرى",
+    job: "معلم اول بمدرسة الشهيد أحمد خليل الصناعية",
+    nationalId: "27805091800641",
+    phone: "010288035065",
+    qualification: "دبلوم مهني/ خاص",
+    hasTot: false,
+    accreditation: "معتمد",
+    performance: "جيد",
+    participation: "مشارك / متعاون"
+  },
+  {
+    id: "6",
+    name: "رجاء ابراهيم محمود عبد الله",
+    governorate: "الإسكندرية",
+    type: "فندقي",
+    specialization: "فندقى",
+    job: "ندب جزئى للمديرية عضو فريق تحسين وضمان الجودة",
+    nationalId: "28506211200444",
+    phone: "1006267115",
+    qualification: "دبلوم مهني/ خاص",
+    hasTot: true,
+    accreditation: "معتمد",
+    performance: "مقبول",
+    participation: "لم يتم تكليفه"
+  }
+];
+

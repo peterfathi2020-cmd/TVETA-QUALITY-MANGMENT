@@ -2,6 +2,11 @@
   "name": " TVETA Quality Management 2026",
   "description": "نظام إدارة ضمان جودة برامج التنمية المهنية - خاص بفريق الدعم الفني ومسؤولي الجودة بالمحافظات",
   "requestFramePermissions": [
-    "geolocation"
+    "geolocation",
+    "microphone",
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
 }
